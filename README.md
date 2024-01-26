@@ -1,12 +1,12 @@
 # ESCC_spatial_isoform
 
-Code for our paper "Spatial Isoform Reveals Mechanisms of Metastasis!"
+Code for our paper "Spatial Isoform Reveals Mechanisms of Metastasis"
 
 You can download the paper via: "".
 
 ## One-Sentence Summary
 
-In this study, by performing SiT, scRNA-seq and TCR analysis of tumor and LN, we identified that temporal heterogeneity of spatial CD74 isoform reveals the expand colocalization of C1QC+ TAMs and CD8+ CXCL13+ Tex cells in LN metastasis of ESCC. We hypothesized that the thyroglobulin type-1 domain, which changes the secondary structure and solvent accessibility, facilitating the colocalization of C1QC+ TAMs and CD8+ CXCL13 T cells. Moreover, we revealed that C1QC+ TAMs may suppress the cytotoxicity of CD8+ CXCL13 Tex cells through the MIF–CD74 ligand receptor pair. Furthermore, the CD74 isoform may be targeted to block this interaction and prevent metastasis and chemoresistance in ESCC.
+By performing SiT, scRNA-seq and TCR analysis of tumor and LN, we identified that temporal heterogeneity of spatial CD74 isoform reveals the expand colocalization of C1QC+ TAMs and CD8+ CXCL13+ Tex cells in LN metastasis of ESCC.  The CD74 isoform may be targeted to block this interaction and prevent metastasis and chemoresistance in ESCC.
 
 
 ## Abstract
