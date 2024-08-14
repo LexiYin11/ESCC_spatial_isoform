@@ -66,7 +66,7 @@ infercnv_obj2 = infercnv::run(infercnv_obj,
                               denoise=T, HMM=F,output_format = "pdf")
 
 
-######### 4. Results Analysis ######
+######### 4. Results Analysis (Fig S8A) ######
 ## after
 setwd("~/onedrive/Work/phD/phd_project/SiT/results/after/inferCNV/SCT/ref_groups_NULL")
 ### get groupings

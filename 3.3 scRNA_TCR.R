@@ -40,7 +40,7 @@ combined_tcr_sce <- combineExpression(combined, tcells_only_sce_anno_ori,
                                       proportion = FALSE, 
                                       cloneTypes=c(Single=1, Small=5, Medium=20, Large=100, Hyperexpanded=500))
 
-###### 3. Visulization #####
+####### 3. Visualization (Fig S13) #####
 ##### 3.1
 pdf("~/onedrive/Work/phD/phd_project/SiT/results/TCR/tcells_cloneType_dimplot.pdf",width = 15)
 DimPlot(combined_tcr_sce, group.by = "cloneType") + scale_color_viridis(discrete = T)

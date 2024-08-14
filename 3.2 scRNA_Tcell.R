@@ -38,7 +38,6 @@ dev.off()
 saveRDS(tcells_only_sce_anno_ori,"~/onedrive/Work/phD/phd_project/SiT/results/sc/merged/remove_doublet/tcells_only_sce_anno_ori.rds")
 #### 2. Monocle3 #######
 ### 2.1 total ####
-##创建CDS对象并预处理数据
 tcells_only_sce_anno <- tcells_only_sce_anno_ori
 data <- GetAssayData(tcells_only_sce_anno, assay = 'RNA', slot = 'counts')
 cell_metadata <- tcells_only_sce_anno@meta.data
@@ -47,12 +46,11 @@ rownames(gene_annotation) <- rownames(data)
 cds <- new_cell_data_set(data,
                          cell_metadata = cell_metadata,
                          gene_metadata = gene_annotation)
-#preprocess_cds函数相当于seurat中NormalizeData+ScaleData+RunPCA
 cds <- preprocess_cds(cds, num_dim = 50)
-#umap降维
+
 cds <- reduce_dimension(cds, preprocess_method = "PCA")
 p1 <- plot_cells(cds, reduction_method="UMAP", color_cells_by="celltype") + ggtitle('cds.umap')
-##从seurat导入整合过的umap坐标
+
 cds.embed <- cds@int_colData$reducedDims$UMAP
 int.embed <- Embeddings(tcells_only_sce_anno, reduction = "umap")
 int.embed <- int.embed[rownames(cds.embed),]
@@ -277,7 +275,7 @@ DimPlot(cd8_tcells_only_sce_anno, reduction = "umap", group.by = "seurat_cluster
 
 dev.off()
 
-#### 4.差异分析 #####
+#### 4.DEG analysis #####
 
 Idents(cd8_tcells_only_sce_anno) = cd8_tcells_only_sce_anno$orig.ident
 table(Idents(cd8_tcells_only_sce_anno))

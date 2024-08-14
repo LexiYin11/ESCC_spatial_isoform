@@ -3,7 +3,7 @@ library(survminer)
 library(EnhancedVolcano)
 library(enrichplot)
 library(clusterProfiler)
-####### 0. Markers #######
+######### 0. Markers #######
 #### Between C1QC+ TAM and FCN1+ TAM
 #TAM_only_sce_anno <- readRDS("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/res_0.5_TAM_only_sce_anno_anno.rds")
 TAM_only_sce_anno <- readRDS("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/TAM_only_sce_anno.rds")
@@ -24,7 +24,7 @@ c1qc_TAM_down = c1qc_TAM_markers%>% select(gene, everything()) %>% subset(avg_lo
 write.csv(c1qc_TAM_up, "~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/c1qc_TAM_up.csv", row.names = F)
 write.csv(c1qc_TAM_down, "~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/c1qc_TAM_down.csv", row.names = F)
 
-######### 1. Volcano plot #######
+######### 1. Volcano plot （Fig S5B) #######
 #### Between C1QC+ TAM and FCN1+ TAM
 keyvals <- rep('black', nrow(c1qc_TAM_markers))
 
@@ -56,55 +56,6 @@ EnhancedVolcano(c1qc_TAM_markers,
                 colCustom = keyvals)
                 
 dev.off()
-
-###### 2. GO pathway ######
-HGNC <- read.delim("~/onedrive/Work/phD/phd_project/TME_gender/rawdata/HGNC_results.txt")
-c1qc_TAM_up_df <- HGNC[HGNC$Approved.symbol %in% c1qc_TAM_up$gene,]
-c1qc_TAM_down_df <- HGNC[HGNC$Approved.symbol %in% c1qc_TAM_down$gene,]
-
-c1qc_up_go <- enrichGO(gene       = c1qc_TAM_up_df$Ensembl.gene.ID,
-                           OrgDb         = org.Hs.eg.db,
-                           keyType =       "ENSEMBL",
-                           ont           = "ALL",
-                           pAdjustMethod = "BH",
-                           pvalueCutoff  = 0.05,
-                           qvalueCutoff  = 0.05,
-                           readable      = TRUE)
-write.csv(c1qc_up_go ,"~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/c1qc_up_go.csv")
-
-c1qc_down_go <- enrichGO(gene       = c1qc_TAM_down_df$Ensembl.gene.ID,
-                       OrgDb         = org.Hs.eg.db,
-                       keyType =       "ENSEMBL",
-                       ont           = "ALL",
-                       pAdjustMethod = "BH",
-                       pvalueCutoff  = 0.05,
-                       qvalueCutoff  = 0.05,
-                       readable      = TRUE)
-write.csv(c1qc_down_go ,"~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/c1qc_down_go.csv")
-
-
-####  filter 
-c1qc_down_go_filtered <- read.csv("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/c1qc_down_go_filtered.csv",row.names = 1)
-c1qc_down_go_filtered$qvalue <- log10(c1qc_down_go_filtered$qvalue )
-c1qc_down_go_filtered$group <- "FCN1+ TAM"
-c1qc_down_go_filtered <- c1qc_down_go_filtered[order(c1qc_down_go_filtered$qvalue,decreasing = T),]
-
-c1qc_up_go_filtered <- read.csv("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/c1qc_up_go_filtered.csv",row.names = 1)
-c1qc_up_go_filtered$qvalue <- -log10(c1qc_up_go_filtered$qvalue )
-c1qc_up_go_filtered$group <- "C1QC+ TAM"
-c1qc_up_go_filtered <- c1qc_up_go_filtered[order(c1qc_up_go_filtered$qvalue,decreasing = F),]
-
-
-#### combine
-combined_go_df <- rbind(c1qc_down_go_filtered, c1qc_up_go_filtered)
-#### Plot 
-combined_go_df$Description <- factor(combined_go_df$Description, levels = combined_go_df$Description)
-pdf("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/c1qc_GO_barplot.pdf",w=10,h=5)
-ggplot(data=combined_go_df, aes(x=Description,y=qvalue, fill=group)) + geom_bar(stat="identity", width=0.8) + coord_flip()+
-        scale_fill_jco() + theme_classic() + ylim(c(-15,15)) + xlab("")
-dev.off()
-
-
 
 ######### 2. Baidu II data #######
 
@@ -159,7 +110,7 @@ length(patient_high_score)
 length(patient_low_score)
 
 
-####### 2.2 exp numerical 临床信息 ######
+####### 2.2 exp numerical clinical information ######
 gsva.c1qc_TAM_markers <- gsva.c1qc_TAM_markers[as.character(metadata_BaiduII$Tumor_Sample_Barcode),]
 clinical_gsva_df <- merge(metadata_BaiduII,gsva.c1qc_TAM_markers, by.x = "Tumor_Sample_Barcode", by.y = "sample")
 clinical_gsva_df <- clinical_gsva_df[clinical_gsva_df$`TNM stage` !="stop",]
@@ -205,7 +156,7 @@ ggboxplot(clinical_gsva_df,x = "Age_group", y = "c1qc_TAM_up",color = "Age_group
  dev.off()
 
  
-####### 2.3 exp categorical 临床信息  #########
+####### 2.3 exp categorical clinical information  #########
 metadata_BaiduII$group <- ifelse(metadata_BaiduII$Tumor_Sample_Barcode %in% patient_high_score,"High", "Low")
 table(metadata_BaiduII$group)
 comparison_all<- function(metadata, file_name){
@@ -452,80 +403,6 @@ ggsave("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/clinical_info/exp_T
 
 
 
-###### NEW !!!! 4. TAM circos heatmap of M1 M2  ####
-m1m2_marker <- readxl::read_xlsx("~/onedrive/Work/phD/phd_project/SiT/rawdata/m1m2_markers.xlsx")
-m1m2_marker <- as.data.frame(m1m2_marker)
-#（好像不是很明显）
-
-### 4.1 M1
-mat <- AverageExpression(TAM_only_sce_anno, group.by = "tam_label",assays = "SCT")
-mat <- mat$SCT
-int_gene <- intersect( c(unlist(m1m2_marker$M1)),rownames(mat))
-mat <- mat[int_gene,]
-mat <- scale(mat)
-
-dim(mat)
-col_fun <- colorRamp2(c(0.5, 0, -0.5), c("#fc5d59", "#ffffbf","#91bfdb" ))
-pdf("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/M1_function_gene_TAM_circos.pdf")
-circos.par(gap.after=10)
-circos.heatmap(as.matrix(mat),  col = col_fun,rownames.side = "outside",
-               cluster = T,track.height =0.4, rownames.cex = 1.2,
-               cell_width = 10) 
-circos.clear()
-dev.off()
-
-### 4.2 M2
-mat <- AverageExpression(TAM_only_sce_anno, group.by = "tam_label",assays = "SCT")
-mat <- mat$SCT
-int_gene <- intersect( c(unlist(m1m2_marker$M2)),rownames(mat))
-mat <- mat[int_gene,]
-mat <- scale(mat)
-
-dim(mat)
-col_fun <- colorRamp2(c(0.5, 0, -0.5), c("#fc5d59", "#ffffbf","#91bfdb" ))
-pdf("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/M2_function_gene_TAM_circos.pdf")
-circos.par(gap.after=10)
-circos.heatmap(as.matrix(mat),  col = col_fun,rownames.side = "outside",
-               cluster = T,track.height =0.4, rownames.cex = 1.2,
-               cell_width = 10) 
-circos.clear()
-dev.off()
-
-### 4.3 Angio
-mat <- AverageExpression(TAM_only_sce_anno, group.by = "tam_label",assays = "SCT")
-mat <- mat$SCT
-int_gene <- intersect( c(unlist(m1m2_marker$Angiogenesis)),rownames(mat))
-mat <- mat[int_gene,]
-mat <- scale(mat)
-
-dim(mat)
-col_fun <- colorRamp2(c(1, 0, -1), c("#fc5d59", "#ffffbf","#91bfdb" ))
-pdf("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/Angio_function_gene_TAM_circos.pdf")
-circos.par(gap.after=10)
-circos.heatmap(as.matrix(mat),  col = col_fun,rownames.side = "outside",
-               cluster = T,track.height =0.4, rownames.cex = 1.2,
-               cell_width = 10) 
-circos.clear()
-dev.off()
-
-### 4.3 Phago
-mat <- AverageExpression(TAM_only_sce_anno, group.by = "tam_label",assays = "SCT")
-mat <- mat$SCT
-int_gene <- intersect( c(unlist(m1m2_marker$Phagocytosis)),rownames(mat))
-mat <- mat[int_gene,]
-mat <- scale(mat)
-
-dim(mat)
-col_fun <- colorRamp2(c(1, 0, -1), c("#fc5d59", "#ffffbf","#91bfdb" ))
-pdf("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/Phago_function_gene_TAM_circos.pdf")
-circos.par(gap.after=10)
-circos.heatmap(as.matrix(mat),  col = col_fun,rownames.side = "outside",
-               cluster = T,track.height =0.4, rownames.cex = 1.2,
-               cell_width = 10) 
-circos.clear()
-dev.off()
-
-
 ##### 5. GSVA of TAM function (celltype and orig.ident) #####
 ## gene list
 tam_function_genesets <- list(M1 = m1m2_marker$M1, M2 = m1m2_marker$M2,
@@ -633,20 +510,4 @@ DotPlot(TAM_only_sce_anno, features = mono_macro_markers , group.by = "tam_label
         cols = "Spectral")
 dev.off()
 
-## circos (不明显)
-mat <- AverageExpression(TAM_only_sce_anno, group.by = "tam_label",assays = "SCT")
-mat <- mat$SCT
-int_gene <- intersect( c(unlist(mono_macro_markers)),rownames(mat))
-mat <- mat[int_gene,]
 
-mat <- scale(mat)
-mat <- scale_mat(mat, scale = "column")
-dim(mat)
-col_fun <- colorRamp2(c(1, 0, -1), c("#fc5d59", "#ffffbf","#91bfdb" ))
-pdf("~/onedrive/Work/phD/phd_project/SiT/results/sc/res_1/Phago_function_gene_TAM_circos.pdf")
-circos.par(gap.after=10)
-circos.heatmap(as.matrix(mat),  col = col_fun,rownames.side = "outside",
-               cluster = T,track.height =0.4, rownames.cex = 1.2,
-               cell_width = 10) 
-circos.clear()
-dev.off()

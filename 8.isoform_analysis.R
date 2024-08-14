@@ -1,10 +1,10 @@
-######### Libraries ##########
+########## 0. library import ##########
 library(dplyr)
 library(Seurat)
 library(pheatmap)
 library(ggplot2)
 library(biomaRt)
-###### 1. read seurat obj ######
+########## 1. Read seurat obj ######
 ## ori
 #before <- readRDS("~/onedrive/Work/phD/phd_project/SiT/rawData/before/Result_X101SC21081081-Z01-J001/3.Seurat/P1_before/P1_before.seurat.rds")
 after <- readRDS("~/onedrive/Work/phD/phd_project/SiT/rawData/after/Result_X101SC21081081-Z01-J002\ 2/3.Seurat/p1_after/p1_after.seurat.rds")
@@ -12,7 +12,7 @@ after_ln <- readRDS("~/onedrive/Work/phD/phd_project/SiT/rawData/after/Result_X1
 
 ## added info
 before <- readRDS("~/onedrive/Work/phD/phd_project/SiT/results/before_minion/before_added_isoform.rds")
-##### 2. cell annotation #######
+########## 2. Cell annotation #######
 ### after LN 
 after_ln@meta.data$celltype <- ifelse(after_ln$seurat_clusters == "0","Bcells, Myeloid and Tcells RGS1+",
                                       ifelse(after_ln$seurat_clusters == "1","Epithelial cells COL1A2+",
@@ -45,7 +45,7 @@ before@meta.data$celltype <- ifelse(before$seurat_clusters == "0",'FRC and Epith
                                                                 ifelse(before$seurat_clusters == "5",'Epithelial MUC4+',"no"))))))
 
 
-###### 3. ISOG assay containing the gene-level nanopore data  #####
+########## 3. ISOG assay containing the gene-level nanopore data  #####
 ## before
 all = read.delim("~/onedrive/Work/phD/phd_project/SiT/rawData/before_minion/Analysis/ont_A_10_28_genematrix.txt", stringsAsFactors = F)
 data = all[,2:ncol(all)]
@@ -79,7 +79,7 @@ after_ln[["ISOG"]] <- CreateAssayObject(counts = data)
 after_ln <- NormalizeData(object = after_ln, assay = "ISOG")
 after_ln <- ScaleData(object = after_ln, assay = "ISOG")
 
-####### 4. ISO assay containing the isoform-level transcript information (only molecules where all eons are ovserved are kept) ########
+########## 4. ISO assay containing the isoform-level transcript information (only molecules where all eons are ovserved are kept) ########
 ## before
 all = read.delim("~/onedrive/Work/phD/phd_project/SiT/rawData/before_minion/Analysis/ont_A_10_28_isomatrix.txt", stringsAsFactors = F)
 data = all[,3:ncol(all)]
@@ -126,7 +126,7 @@ after_ln <- ScaleData(after_ln, assay = "ISO")
 saveRDS(after_ln,"~/onedrive/Work/phD/phd_project/SiT/results/after_ln_added_isoform.rds")
 
 
-################### Isoform Spatially distribution stat  ###################
+########## 5. Isoform Spatially distribution stat  ###################
 df <- as.data.frame(before@assays$ISO@counts)
 df$geneId <- sapply(strsplit(rownames(df), "\\.\\."), `[`, 1)
 df$transcriptId <- sapply(strsplit(rownames(df), "\\.\\."), `[`, 2)
@@ -145,7 +145,7 @@ ggplot(data=dat, aes(x=Var1, y=Freq, fill=rep)) +
   theme_minimal()
 dev.off()
 
-######## 5. generate MULTI assay containing only isoforms from multi-isoforms genes######
+######## 5.1 generate MULTI assay containing only isoforms from multi-isoforms genes######
 #### before ####
 df <- as.data.frame(before@assays$ISO@counts)
 df$geneId <- sapply(strsplit(rownames(df), "\\.\\."), `[`, 1)
@@ -480,7 +480,7 @@ totaladj <- read_csv("results/after_minion/after_ln.isoswitch.csv")
 # totaladj_sig <- unique(totaladj_sig$geneId)
 
 
-########## 6. Check isoform number vs cluster ######
+######## 5.2 Check isoform number vs cluster ######
 before <- readRDS("~/onedrive/Work/phD/phd_project/SiT/results/before_minion/before_added_isoform.rds")
 after <- readRDS("~/onedrive/Work/phD/phd_project/SiT/results/after_minion/after_added_isoform.rds")
 after_ln <- readRDS("~/onedrive/Work/phD/phd_project/SiT/results/after_ln_minion/after_ln_added_isoform.rds")
@@ -519,7 +519,7 @@ after_ln_isoform_number
 #ISO 17325 22655 16038 21141 15899 16560
 #MULTI 14179 18485 13238 17256 13128 13673
 
-########## 7. Check isoform marker for each cluster #######
+######## 5.3 Check isoform marker for each cluster #######
 ##### after_ln
 after_ln_added_isoform <- readRDS("~/onedrive/Work/phD/phd_project/SiT/results/after_ln_minion/after_ln_added_isoform.rds")
 
@@ -534,7 +534,7 @@ write.csv(cluster_markers_sig,"~/onedrive/Work/phD/phd_project/SiT/results/isofo
 
 
 
-########## 8. check isoform spatial level #######
+######## 5.4 check isoform spatial level #######
 ## function
 isoform_spatial_level <- function(gene_list,seurat){
   plot_list <- list()
@@ -548,7 +548,7 @@ isoform_spatial_level <- function(gene_list,seurat){
   }
   return(plot_list)
 }
-########### CD74 only in after ISO marker #####
+########## 6. CD74 only in after ISO marker #####
 plot_list <- list()
 seurat <- after
 for (i in 1:length(gene_list)){
@@ -567,7 +567,7 @@ for(i in 1:length(plot_list)){
 }
 dev.off()
 
-########### CD74 only in before ISO marker #####
+########## 7. CD74 only in before ISO marker #####
 plot_list <- list()
 seurat <- before
 for (i in 1:length(gene_list)){
@@ -587,7 +587,7 @@ for(i in 1:length(plot_list)){
 dev.off()
 
 
-######## RPS/L isoform overlap in CD8_CXCL13 clusters ########
+########## 8. RPS/L isoform overlap in CD8_CXCL13 clusters ########
 ### after_ln RPL
 after_ln_cluster_markers <- read.csv("~/onedrive/Work/phD/phd_project/SiT/results/isoform_cluster_markers/after_ln_cluster_markers.csv")
 after_ln_cluster_markers <- after_ln_cluster_markers[after_ln_cluster_markers$cluster == 0,]

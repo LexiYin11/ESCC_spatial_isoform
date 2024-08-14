@@ -18,7 +18,7 @@ mean(after_ln@meta.data$nCount_profiled)
 # 22.99359
 after_ln@meta.data$nFeature_profiled <- after_ln@meta.data
 
-############# 2. Correlation illumina/Nanopore (r²) ##########
+############# 2. Correlation illumina/Nanopore (r²) （Fig S2A) ##########
 ## before
 p1 <- ggplot(data=before@meta.data, aes(x=nFeature_Spatial,y=nFeature_ISOG,fill = before@active.ident)) +  geom_point(shape = 21, colour = "black") +
   theme_bw() + theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank()) +
@@ -268,7 +268,7 @@ plot_grid(p1, p2, p3, ncol=3)
 dev.off()
 
 
-############# 4. ISO Distribution plots ########
+############# 4. ISO Distribution plots (Fig S1C) ########
 ## before
 plot1 <- ggplot(data=before@meta.data, aes(nCount_ISO)) + 
   geom_histogram(breaks=seq(0, 16000, by = 250),col="black",aes(fill=nGene),fill="lightsteelblue3") + 
